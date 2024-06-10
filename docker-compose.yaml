@@ -1,7 +1,7 @@
 services:
   llm_cpp:
     image: pkalkman/llama.cpp:0.2.1-cuda
-    command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/openhermes-2.5-mistral-7b.Q2_K.gguf"]
+    command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/openhermes-mistral-7b.gguf"]
     ports:
       - "8080:8080"
     volumes:
@@ -13,3 +13,9 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+  llm_api:
+    image: pkalkman/llama-internal-api:0.2.1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - llm_cpp      

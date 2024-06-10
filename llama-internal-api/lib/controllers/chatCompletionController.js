@@ -1,61 +1,44 @@
 import logger from '../utils/logger.js';
-import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:8080',
+});
+
+const pipelineAsync = promisify(pipeline);
 
 const chatCompletionController = {};
 
 chatCompletionController.chatCompletion = async (req, reply) => {
   try {
-    const {
-      model,
-      messages,
-      max_tokens,
-      temperature,
-      top_p,
-      n,
-      stream,
-      stop,
-      presence_penalty,
-      frequency_penalty,
-      logit_bias,
-      user
-    } = req.body;
+    const response = await axiosInstance.post('/chat/completions', req.body, {
+      responseType: 'stream',
+    });
 
-    // Generate a unique ID for the response
-    const responseId = uuidv4();
+    logger.info('Request successfully processed by llama_cpp service');
 
-    // Get the current timestamp in seconds
-    const createdTimestamp = Math.floor(Date.now() / 1000);
+    reply.raw.writeHead(response.status, {
+      'Content-Type': response.headers['content-type'],
+      'Transfer-Encoding': 'chunked',
+    });
 
-    // Determine the content of the assistant's message
-    let assistantContent = 'As a mock AI Assistant, I can only echo your last message, but there were no messages!';
-    if (messages && messages.length > 0) {
-      const lastUserMessage = messages.filter(msg => msg.role === 'user').pop();
-      if (lastUserMessage) {
-        assistantContent = `You said: "${lastUserMessage.content}"`;
-      }
-    }
+    await pipelineAsync(response.data, reply.raw);
 
-    // Create the response object
-    const response = {
-      id: responseId,
-      object: 'chat.completion',
-      created: createdTimestamp,
-      model,
-      choices: [
-        {
-          message: {
-            role: 'assistant',
-            content: assistantContent,
-          },
-        },
-      ],
-    };
-
-    reply.send(response);
   } catch (error) {
-    logger.error(`Error in chatCompletionController.chatCompletion: ${error}`);
-    reply.status(500).send({ error: 'Internal Server Error' });
+    logger.error(`Error in chatCompletionController.chatCompletion: ${error.message}`);
+
+    if (error.response) {
+      reply.send(reply.httpErrors.createError(error.response.status, {
+        message: error.response.data.error || 'Error from llama_cpp service',
+      }));
+    } else if (error.code === 'ECONNREFUSED') {
+      reply.serviceUnavailable();
+    } else {
+      reply.internalServerError();
+    }
   }
-};
+}
 
 export default chatCompletionController;

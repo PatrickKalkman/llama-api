@@ -1,5 +1,5 @@
 services:
-  llm:
+  llm_cpp:
     image: pkalkman/llama.cpp:0.2.1-cuda
     command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/openhermes-2.5-mistral-7b.Q2_K.gguf"]
     ports:

@@ -1,4 +1,3 @@
-// Dependencies
 import process from 'process';
 import logger from './lib/utils/logger.js';
 import server from './lib/server.js';
@@ -9,7 +8,6 @@ class App {
   init() {
     server.start();
   }
-
 
   shutdown() {
     server.stop();

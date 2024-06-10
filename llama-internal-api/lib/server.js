@@ -1,3 +1,4 @@
+import process from 'process';
 import pino from 'pino';
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
@@ -18,10 +19,8 @@ const fastify = Fastify({
   logger,
 });
 
-
 fastify.register(fastifyPrintRoutes);
 fastify.register(sensible);
-
 
 const server = {};
 
@@ -31,7 +30,8 @@ fastify.register((instance, opts, next) => {
 });
 
 server.start = function start() {
-  fastify.listen({ port: 8080, host: '0.0.0.0'  }, (err) => {
+  const port = process.env.SERVER_PORT || 8000;
+  fastify.listen({ port: port, host: '0.0.0.0'  }, (err) => {
     if (!err) {
       fastify.log.info(`The http server is running and listening on port ${fastify.server.address().port}`);
     } else {

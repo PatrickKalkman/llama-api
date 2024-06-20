@@ -1,7 +1,7 @@
 services:
   llm_cpp:
     image: pkalkman/llama.cpp:0.2.1-cuda
-    command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/openhermes-mistral-7b.gguf"]
+    command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/Meta-Llama-3-8B-Instruct.Q8_0.gguf"]
     ports:
       - "8080:8080"
     volumes:

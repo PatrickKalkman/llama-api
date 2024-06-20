@@ -4,7 +4,7 @@ import { pipeline } from 'stream';
 import { promisify } from 'util';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://localhost:8080', // use llm_cpp for production
 });
 
 const pipelineAsync = promisify(pipeline);

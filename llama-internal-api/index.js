@@ -1,6 +1,9 @@
 import process from 'process';
+import dotenv from 'dotenv';
 import logger from './lib/utils/logger.js';
 import server from './lib/server.js';
+
+dotenv.config();
 
 class App {
   constructor() {}

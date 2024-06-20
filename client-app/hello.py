@@ -2,10 +2,11 @@ from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
     temperature=0.5,
-    model="openhermes-mistral-7b.gguf",
+    model="anymodel.gguf",
     openai_api_base="http://localhost:8000",
-    openai_api_key="ed"
+    openai_api_key="ey"
 )
+
 
 try:
     for chunk in llm.stream("Write me a python script that validates an email address"):
